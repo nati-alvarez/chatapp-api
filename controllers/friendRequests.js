@@ -1,7 +1,7 @@
 exports.getFriendRequests = function(req, res){
     var friendRequests = [];
 
-    global.DB.execute("SELECT users.username, users.id AS user_id, users.profile_picture, friendships.status, friendships.id, friendships.sender_id, friendships.recipient_id FROM friendships, users WHERE friendships.recipient_id = ? AND users.id = friendships.sender_id AND status = 0",
+    global.DB.query("SELECT users.username, users.id AS user_id, users.profile_picture, friendships.status, friendships.id, friendships.sender_id, friendships.recipient_id FROM friendships, users WHERE friendships.recipient_id = ? AND users.id = friendships.sender_id AND status = 0",
     [req.user.id],
     function(err, result){
         if(err) return res.status(500).json({success: false, message: "An error occurred", err});
@@ -40,7 +40,7 @@ exports.sendFriendRequest = function(req, res){
     //forever alone ECKS DEEE XD LMAO
     if(req.user.id == req.body.recipientId) return res.status(406).json({success: false, message: "You can't friend yourself loser."})
     
-    global.DB.execute("INSERT INTO friendships (sender_id, recipient_id, identifier) VALUES (?, ?, ?)",
+    global.DB.query("INSERT INTO friendships (sender_id, recipient_id, identifier) VALUES (?, ?, ?)",
     [req.user.id, req.body.recipientId, identifier],
     function(err, result){
         if(err) return res.status(500).json({success: false, message: "An error occurred", err});
@@ -50,7 +50,7 @@ exports.sendFriendRequest = function(req, res){
 }
 
 exports.acceptFriendRequest = function(req, res){
-    global.DB.execute("UPDATE friendships SET status = 1 WHERE id = ? AND recipient_id = ?",
+    global.DB.query("UPDATE friendships SET status = 1 WHERE id = ? AND recipient_id = ?",
     [req.params.id, req.user.id],
     function(err, result){
         if(err) return res.status(500).json({success: false, message: "An error occurred.", err});
@@ -60,7 +60,7 @@ exports.acceptFriendRequest = function(req, res){
 }
 
 exports.declineFriendRequest = function(req, res){
-    global.DB.execute("DELETE from friendships WHERE id = ? AND recipient_id = ?",
+    global.DB.query("DELETE from friendships WHERE id = ? AND recipient_id = ?",
     [req.params.id, req.user.id],
     function(err, result){
         if(err) return res.status(500).json({success: false, message: "An error occurred.", err});

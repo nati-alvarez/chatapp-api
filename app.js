@@ -38,10 +38,6 @@ global.DB = mysql2.createConnection({
     database: process.env.DB_NAME || "chatapp"
 });
 
-app.get("/", (req, res)=>{
-    res.status(200).json({answer: "there is no answer"});
-});
-
 app.use("/", routes);
 
 server.listen(80, ()=>console.log("app is listening"));

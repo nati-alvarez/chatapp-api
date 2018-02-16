@@ -3,11 +3,12 @@ const jwt = require("jsonwebtoken");
 const uuid = require('uuid/v1');
 
 exports.login = function(req, res){
-    global.DB.execute(
+    global.DB.query(
         "SELECT *  FROM `users` WHERE `username` = ?",
         [req.body.username],
         (err, user)=>{
             //server error
+            console.log(err);
             if(err) return res.status(500).json({success: false, err, message: "An error occurred"});
 
             //user not found
@@ -37,7 +38,7 @@ exports.login = function(req, res){
 exports.signup = function(req, res){
     var verificationToken = uuid();
 
-    global.DB.execute(
+    global.DB.query(
         "INSERT INTO users (username, email, password, verification_token) VALUES (?, ?, ?, ?)",
         [req.body.username, req.body.email, bcrypt.hashSync(req.body.password, 10), verificationToken],
         function(err, result){
@@ -65,7 +66,7 @@ exports.signup = function(req, res){
 exports.verify = function(req, res){
     if(!req.query.token) return res.status(403).json({success: false, message: "Invalid verification token."});
 
-    global.DB.execute("SELECT * FROM users where verification_token = ?",
+    global.DB.query("SELECT * FROM users where verification_token = ?",
     [req.query.token],
     function(err, user){
         //server error
@@ -76,7 +77,7 @@ exports.verify = function(req, res){
 
         if(user[0].verified === 1) return res.status(403).json({success: false, message: "Account already verified."});
 
-        global.DB.execute("UPDATE users SET verified = 1 WHERE verification_token = ?",
+        global.DB.query("UPDATE users SET verified = 1 WHERE verification_token = ?",
         [req.query.token],
         function(err, result){
             //server error

@@ -2,7 +2,7 @@ const fs = require("fs");
 
 exports.getChatroom = function(req, res){
     //check if friendship exists between the users
-    global.DB.execute("SELECT identifier FROM friendships WHERE identifier = ? AND status = 1 AND sender_id = ? OR recipient_id = ? AND status = 1",
+    global.DB.query("SELECT identifier FROM friendships WHERE identifier = ? AND status = 1 AND sender_id = ? OR recipient_id = ? AND status = 1",
     [req.params.chatroom, req.user.id, req.user.id],
     function(err, result){
         var chatroom = result[0];
